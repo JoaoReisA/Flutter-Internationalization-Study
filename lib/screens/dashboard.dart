@@ -12,17 +12,21 @@ class DashboardContainer extends BlocContainer {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => NameCubit("Guilherme"),
-     child: DashboardView(),
+      child: I18NLoadingContainer(
+          (I18NMessages messages) => DashboardView(DashboardViewLazyI18n(messages))),
     );
   }
 }
 
 class DashboardView extends StatelessWidget {
+  final DashboardViewLazyI18n i18n;
+
+  DashboardView(this.i18n);
+
   @override
   Widget build(BuildContext context) {
-    final i18n = DashboardViewI18n(context);
     return Scaffold(
-       appBar: AppBar(
+      appBar: AppBar(
         backgroundColor: Theme.of(context).primaryColor,
         title: BlocBuilder<NameCubit, String>(
           builder: (context, state) => Text('Welcome $state'),
@@ -90,17 +94,30 @@ class DashboardView extends StatelessWidget {
   }
 }
 
-class DashboardViewI18n extends ViewI18N{
-  DashboardViewI18n(BuildContext context) : super(context);
+class DashboardViewLazyI18n {
+  final I18NMessages messages;
+  DashboardViewLazyI18n(this.messages);
 
-  String get transfer => localize({"pt-br": "Transferir", "en" : "Transfer"});
-  String get transactionFeed => localize({"pt-br": "Transações", "en" : "Transaction feed"});
-  String get changeName => localize({"pt-br": "Trocar Nome", "en" : "Change Name"});
-
-
+  String get transfer => 
+  messages.get("transfer");
+  // localize({"pt-br": "Transferir", "en": "Transfer"});
+  String get transactionFeed =>
+  messages.get("transactionFeed");
+  // localize({"pt-br": "Transações", "en": "Transaction feed"});
+  String get changeName =>
+  messages.get("changeName");
+  // localize({"pt-br": "Trocar Nome", "en": "Change Name"});
 }
 
+class DashboardViewI18n extends ViewI18N {
+  DashboardViewI18n(BuildContext context) : super(context);
 
+  String get transfer => localize({"pt-br": "Transferir", "en": "Transfer"});
+  String get transactionFeed =>
+      localize({"pt-br": "Transações", "en": "Transaction feed"});
+  String get changeName =>
+      localize({"pt-br": "Trocar Nome", "en": "Change Name"});
+}
 
 class _FeatureItem extends StatelessWidget {
   final String name;
