@@ -26,7 +26,7 @@ class LoadedI18NMessagesState extends I18NMessagesState {
 }
 
 class I18NMessages {
-  final Map<String, String> _messages;
+  final Map<String, dynamic> _messages;
   I18NMessages(this._messages);
   String get(String key) {
     assert(key != null);
@@ -67,7 +67,7 @@ class ViewI18N {
     this._language = BlocProvider.of<CurrentLocaleCubit>(context).state;
   }
 
-  String localize(Map<String, String> values) {
+  String localize(Map<String, dynamic> values) {
     assert(values != null);
     assert(values.containsKey(_language));
     return values[_language];
@@ -115,14 +115,14 @@ typedef Widget I18NWidgetCreator(I18NMessages messages);
 
 class I18NLoadingContainer extends BlocContainer {
   final I18NWidgetCreator creator;
-
-  I18NLoadingContainer(this.creator);
+  final String viewKey;
+  I18NLoadingContainer({@required this.viewKey, @required this.creator});
   @override
   Widget build(BuildContext context) {
     return BlocProvider<I18NMessagesCubit>(
       create: (context) {
         final cubit = I18NMessagesCubit();
-        cubit.reload(I18NWebClient());
+        cubit.reload(I18NWebClient(this.viewKey));
         return cubit;
       },
       child: I18NLoadingView(this.creator),
