@@ -1,6 +1,7 @@
 //localization and internalization
 import 'package:bytebank/components/error.dart';
 import 'package:bytebank/components/progress.dart';
+import 'package:bytebank/http/webclients/i18n_web_client.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -99,18 +100,14 @@ class I18NLoadingView extends StatelessWidget {
 class I18NMessagesCubit extends Cubit<I18NMessagesState> {
   I18NMessagesCubit() : super(InitI18NMessagesState());
 
-  void reload() {
+  void reload(I18NWebClient client) {
     emit(LoadingI18NMessagesState());
 
-    //TODO carregar
-    emit(LoadedI18NMessagesState(
-        messages: I18NMessages(
-      {
-        "transfer": "TRANSFER",
-        "transactionFeed": "TRANSACTION FEED",
-        "changeName": "CHANGE NAME"
-      },
-    )));
+    client.findAll().then((messages) => emit(
+          LoadedI18NMessagesState(
+            messages: I18NMessages(messages),
+          ),
+        ));
   }
 }
 
@@ -125,7 +122,7 @@ class I18NLoadingContainer extends BlocContainer {
     return BlocProvider<I18NMessagesCubit>(
       create: (context) {
         final cubit = I18NMessagesCubit();
-        cubit.reload();
+        cubit.reload(I18NWebClient());
         return cubit;
       },
       child: I18NLoadingView(this.creator),
